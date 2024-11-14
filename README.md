@@ -26,7 +26,7 @@ This portfolio is built with a responsive and modern design, using **HTML**, **C
 
 // You can view the live site here:
 
-//[Live Site Link](https://github.com/johnjijojosef/johnjijojosefresume)
+//[Live Site Link] (https://johnjijojosef.github.io/johnjijojosefresume/)
 
 ## 📂 Structure
 
