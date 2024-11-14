@@ -22,11 +22,11 @@ This portfolio is built with a responsive and modern design, using **HTML**, **C
 - **Particles.js**: For background particle animations, adding a unique visual element
 - **Form Handling**: [EmailJS](https://www.emailjs.com/) (or [Formspree](https://formspree.io), if chosen) for handling form submissions directly to my email
 
-//## 🌐 Deployment
+## 🌐 Deployment
 
-// You can view the live site here:
+ You can view the live site here:
 
-//[Live Site Link] (https://johnjijojosef.github.io/johnjijojosefresume/)
+[Live Site Link] (https://johnjijojosef.github.io/johnjijojosefresume/)
 
 ## 📂 Structure
 
