@@ -1,5 +1,5 @@
 :root {
-    --primary-color: #2563eb;
+    --primary-color: #000000;
     --secondary-color: #f8fafc;
     --text-color: #1e293b;
     --accent-color: #3b82f6;
@@ -187,7 +187,7 @@ section {
 
 /* Education */
 .education-item h3 a {
-    color: inherit;
+    color: var(--text-color);
     text-decoration: none;
 }
 
@@ -199,7 +199,7 @@ section {
 }
 
 .education-item h3 {
-    color: var(--accent-color);
+    color: var(--text-color);
     margin-bottom: 10px;
 }
 
@@ -247,7 +247,7 @@ section {
 }
 
 .skill-category h3 {
-    color: var(--accent-color);
+    color: var(--text-color);
     margin-bottom: 15px;
 }
 
