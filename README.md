@@ -20,7 +20,6 @@ This portfolio is built with a responsive and modern design, using **HTML**, **C
 - **Frontend**: HTML, CSS, JavaScript
 - **Animations**: AOS (Animate on Scroll) for smooth scroll effects
 - **Particles.js**: For background particle animations, adding a unique visual element
-- **Form Handling**: [EmailJS](https://www.emailjs.com/) (or [Formspree](https://formspree.io), if chosen) for handling form submissions directly to my email
 
 ## 🌐 Deployment
 
