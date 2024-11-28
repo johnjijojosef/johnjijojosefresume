@@ -64,3 +64,26 @@ AOS.init({
     once: true,
     offset: 100
 });
+
+function handleSubmit(event) {
+    event.preventDefault();
+
+    const templateParams = {
+        from_name: document.getElementById('name').value,
+        from_email: document.getElementById('email').value,
+        message: document.getElementById('message').value,
+    };
+
+    console.log("Template Parameters:", templateParams);
+
+    emailjs.send('service_e3g7lu6', 'template_f91ye04', templateParams)
+        .then((response) => {
+            console.log('Email sent successfully:', response.status, response.text);
+            document.getElementById('response').innerText = 'Message sent successfully!';
+            document.getElementById('contact-form').reset();
+        })
+        .catch((error) => {
+            console.error('Failed to send email:', error);
+            document.getElementById('response').innerText = 'Failed to send message. Please try again.';
+        });
+}
