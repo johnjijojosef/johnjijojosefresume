@@ -87,3 +87,9 @@ function handleSubmit(event) {
             document.getElementById('response').innerText = 'Failed to send message. Please try again.';
         });
 }
+
+document.addEventListener('DOMContentLoaded', () => {
+    const currentYear = new Date().getFullYear();
+    document.getElementById('year').textContent = currentYear;
+});
+
