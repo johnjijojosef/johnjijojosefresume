@@ -14,7 +14,8 @@ This portfolio is built with a responsive and modern design, using **HTML**, **C
 - **Skills Section**: Categorized skill sets to highlight my expertise in specific areas.
 - **Certifications**: Display of my certifications with relevant icons and dates.
 - **Contact Form**: A simple contact form to send messages directly to my email.
-
+- **Integrated with [EmailJS](https://www.emailjs.com/):** Allows users to send messages directly from the contact form without requiring a backend server.
+  
 ## 🛠️ Technologies Used
 
 - **Frontend**: HTML, CSS, JavaScript
@@ -34,6 +35,31 @@ This portfolio is built with a responsive and modern design, using **HTML**, **C
 - `scripts.js`: JavaScript file for theme toggling, form handling, animations, and interactivity.
 - `packages/`: Folder containing images, icons, and other assets used throughout the site.
 
+## Email Functionality
+
+- **Integrated with [EmailJS](https://www.emailjs.com/):** Allows users to send messages directly from the contact form without requiring a backend server.
+- **Dynamic Template Parameters:**
+  - `from_name`: Captures the sender's name.
+  - `from_email`: Captures the sender's email address.
+  - `message`: Captures the content of the message.
+
+### How It Works
+1. The form collects user input for `name`, `email`, and `message`.
+2. These inputs are passed as parameters to EmailJS through its `send` method.
+3. EmailJS processes the data and sends an email based on the configured template.
+
+### Email Configuration Steps
+1. **Sign up for EmailJS**:
+   - Create an account at [EmailJS](https://www.emailjs.com/).
+2. **Create a Service**:
+   - In the EmailJS dashboard, set up a service to handle your emails.
+3. **Create a Template**:
+   - Define a template that uses the `from_name`, `from_email`, and `message` parameters.
+4. **Get Your API Keys**:
+   - Obtain the `serviceID`, `templateID`, and `publicKey` from the EmailJS dashboard.
+5. **Update the Code**:
+   - Replace placeholders in the JavaScript code with your actual EmailJS credentials.
+
 ## 🚀 Getting Started
 
 To view or modify the code locally:
@@ -41,3 +67,4 @@ To view or modify the code locally:
 1. Clone this repository:
    ```bash
    git clone https://github.com/johnjijojosef/johnjijojosefresume.git
+   
