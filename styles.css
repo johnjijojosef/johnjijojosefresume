@@ -69,7 +69,7 @@ nav {
 }
 
 .logo img {
-    height: 100px; 
+    height: 75px; 
     width: auto;
     border-radius: 50%;
 }
@@ -114,7 +114,7 @@ nav {
 .profile-photo {
     width: 150px;
     height: 150px;
-    border-radius: 50%;
+    border-radius: 20%;
     margin-bottom: 20px;
     box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
 }
