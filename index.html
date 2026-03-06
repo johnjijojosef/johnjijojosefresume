@@ -172,7 +172,7 @@ function init(){ return "ok" }
   "token": "RkxBR3tDT05GSUdfUFJBQ1RJQ0VTfQ=="
 }</pre>
         <div class="input-row">
-          <button class="btn" id="c2_decode">Decode token</button>
+          
           <button class="btn" data-hint="c2_hint">💡 Hint</button>
         </div>
         <div class="hint" id="c2_hint">The value looks like Base64. Decode it, then submit in FLAG{...} format.</div>
@@ -200,7 +200,7 @@ Mar  6 09:12:42 web01 sshd[9530]: Failed password for root from 10.10.10.13 port
         </div>
         <div class="hint" id="c3_hint">Look for many failures from the same source — brute force attempts often reuse an IP.</div>
         <div class="input-row">
-          <input id="c3_in" type="text" placeholder="e.g., FLAG{10.10.10.13}" />
+          <input id="c3_in" type="text" placeholder="e.g., FLAG{IP_ADDRESS}" />
           <button class="btn good" data-submit="c3">Submit</button>
           <span id="c3_status"></span>
         </div>
