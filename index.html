@@ -177,7 +177,7 @@ function init(){ return "ok" }
         </div>
         <div class="hint" id="c2_hint">The value looks like Base64. Decode it, then submit in FLAG{...} format.</div>
         <div class="input-row">
-          <input id="c2_in" type="text" placeholder="Paste the decoded flag e.g., FLAG{...}" />
+          <input id="c2_in" type="text" placeholder="Paste the flag e.g., FLAG{...}" />
           <button class="btn good" data-submit="c2">Submit</button>
           <span id="c2_status"></span>
         </div>
@@ -200,7 +200,7 @@ Mar  6 09:12:42 web01 sshd[9530]: Failed password for root from 10.10.10.13 port
         </div>
         <div class="hint" id="c3_hint">Look for many failures from the same source — brute force attempts often reuse an IP.</div>
         <div class="input-row">
-          <input id="c3_in" type="text" placeholder="e.g., FLAG{IP_ADDRESS}" />
+          <input id="c3_in" type="text" placeholder="Paste the flag e.g., FLAG{...}" />
           <button class="btn good" data-submit="c3">Submit</button>
           <span id="c3_status"></span>
         </div>
@@ -330,7 +330,7 @@ Ciphers: ALL:!aNULL</pre>
         </div>
         <div class="hint" id="c7_hint">Compare response sizes and filenames that often contain sensitive data. Non‑browser clients can be a clue.</div>
         <div class="input-row">
-          <input id="c7_in" type="text" placeholder="e.g., FLAG{/backup/weekly.tar.gz}" />
+          <input id="c7_in" type="text" placeholder="Paste the flag e.g., FLAG{...}" />
           <button class="btn good" data-submit="c7">Submit</button>
           <span id="c7_status"></span>
         </div>
