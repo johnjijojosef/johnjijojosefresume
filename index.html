@@ -175,7 +175,7 @@ function init(){ return "ok" }
           <button class="btn" id="c2_decode">Decode token</button>
           <button class="btn" data-hint="c2_hint">💡 Hint</button>
         </div>
-        <div class="hint" id="c2_hint">The value looks like Base64 (A–Z, a–z, 0–9, +, /, =). Use a decoder (or the button) and submit the result in FLAG{...} format.</div>
+        <div class="hint" id="c2_hint">The value looks like Base64. Decode it, then submit in FLAG{...} format.</div>
         <div class="input-row">
           <input id="c2_in" type="text" placeholder="Paste the decoded flag e.g., FLAG{...}" />
           <button class="btn good" data-submit="c2">Submit</button>
@@ -235,123 +235,104 @@ Mar  6 09:12:42 web01 sshd[9530]: Failed password for root from 10.10.10.13 port
         </div>
       </article>
 
-      <!-- Challenge 5: Security Headers -->
-      <article class="card" id="c5">
-        <div class="meta">Category: Hardening • Difficulty: ★☆☆</div>
-        <h2>5) Secure Headers (Apply protections)</h2>
-        <p>This mock scan shows missing security headers. Click “Apply Headers” to harden the app and reveal the flag.</p>
-        <div class="grid" style="gap:10px; grid-template-columns: repeat(12,1fr);">
-          <div class="card" style="grid-column: span 12; padding:10px; background:#0b1221;">
-            <div><span class="tag">Report</span></div>
-            <ul>
-              <li><span class="bad">Missing</span>: Content-Security-Policy</li>
-              <li><span class="bad">Missing</span>: X-Content-Type-Options</li>
-              <li><span class="bad">Missing</span>: Strict-Transport-Security</li>
-              <li><span class="bad">Missing</span>: X-Frame-Options</li>
-            </ul>
+      <!-- Challenge 5 (NEW): TLS Hardening -->
+      <article class="card half" id="c5">
+        <div class="meta">Category: Hardening • Difficulty: ★★☆</div>
+        <h2>5) TLS Hardening (Pick the safest config)</h2>
+        <p>Which configuration is the <em>most secure baseline</em> for a public web service?</p>
+        <div class="emails">
+          <div class="email">
+            <h4>A</h4>
+<pre>Protocols: TLSv1, TLSv1.1, TLSv1.2
+Ciphers: AES256-SHA, RC4-SHA</pre>
+            <label class="choice"><input type="radio" name="tls" value="A" /> Choose A</label>
+          </div>
+          <div class="email">
+            <h4>B</h4>
+<pre>Protocols: TLSv1.2, TLSv1.3
+Ciphers: ECDHE-ECDSA-AES256-GCM-SHA384,
+         ECDHE-RSA-CHACHA20-POLY1305</pre>
+            <label class="choice"><input type="radio" name="tls" value="B" /> Choose B</label>
+          </div>
+          <div class="email">
+            <h4>C</h4>
+<pre>Protocols: TLSv1, TLSv1.2
+Ciphers: ALL:!aNULL</pre>
+            <label class="choice"><input type="radio" name="tls" value="C" /> Choose C</label>
           </div>
         </div>
         <div class="input-row">
-          <button class="btn good" id="c5_apply">Apply Headers</button>
+          <button class="btn" id="c5_check">Check Answer</button>
           <button class="btn" data-hint="c5_hint">💡 Hint</button>
         </div>
-        <div class="hint" id="c5_hint">These headers mitigate clickjacking, MIME sniffing, downgrade attacks, and inline script risks.</div>
-        <div id="c5_after" class="hidden">
-          <div class="hr"></div>
-          <p class="ok">✅ Hardened:</p>
-          <pre>Content-Security-Policy: default-src 'self'
-X-Content-Type-Options: nosniff
-Strict-Transport-Security: max-age=31536000; includeSubDomains; preload
-X-Frame-Options: DENY</pre>
-          <span class="flag">🛡️ FLAG{SECURE_HEADERS}</span>
-        </div>
-        <div class="input-row">
-          <input id="c5_in" type="text" placeholder="Paste the flag e.g., FLAG{...}" />
-          <button class="btn good" data-submit="c5">Submit</button>
-          <span id="c5_status"></span>
-        </div>
+        <div class="hint" id="c5_hint">Favor modern protocol versions and ciphers that provide forward secrecy and authenticated encryption.</div>
       </article>
 
-      <!-- Challenge 6: Least Privilege IAM -->
+      <!-- Challenge 6 (NEW): SIEM Tuning -->
       <article class="card half" id="c6">
-        <div class="meta">Category: Identity & Access • Difficulty: ★★☆</div>
-        <h2>6) Least Privilege (Pick the safest policy)</h2>
-        <p>Which policy grants <strong>read-only</strong> access to only the <code>reports-2026</code> bucket objects?</p>
-
-        <div class="grid" style="gap:10px; grid-template-columns: repeat(12,1fr);">
-          <div class="card" style="grid-column: span 12; padding:10px; background:#0b1221;">
-            <div><span class="tag">Candidates</span></div>
-            <div class="emails">
-              <div class="email">
-                <h4>A (Overly broad)</h4>
-<pre>{
-  "Effect": "Allow",
-  "Action": "s3:*",
-  "Resource": "*"
-}</pre>
-                <label class="choice"><input type="radio" name="iam" value="A" /> Choose A</label>
-              </div>
-              <div class="email">
-                <h4>B (Least privilege)</h4>
-<pre>{
-  "Effect": "Allow",
-  "Action": ["s3:GetObject"],
-  "Resource": "arn:aws:s3:::reports-2026/*"
-}</pre>
-                <label class="choice"><input type="radio" name="iam" value="B" /> Choose B</label>
-              </div>
-              <div class="email">
-                <h4>C (Too broad on actions)</h4>
-<pre>{
-  "Effect": "Allow",
-  "Action": ["s3:*"],
-  "Resource": "arn:aws:s3:::reports-2026/*"
-}</pre>
-                <label class="choice"><input type="radio" name="iam" value="C" /> Choose C</label>
-              </div>
-            </div>
+        <div class="meta">Category: Detection Engineering • Difficulty: ★★☆</div>
+        <h2>6) SIEM Tuning (Sequence: fail → success)</h2>
+        <p>Choose the query that detects <strong>≥3 failed logins</strong> followed by a <strong>success</strong> from the <strong>same IP</strong> within <strong>5 minutes</strong>.</p>
+        <div class="emails">
+          <div class="email">
+            <h4>A</h4>
+<pre>SigninLogs
+| where ResultType != 0</pre>
+            <label class="choice"><input type="radio" name="kql" value="A" /> Choose A</label>
+          </div>
+          <div class="email">
+            <h4>B</h4>
+<pre>SigninLogs
+| where ResultType != 0
+| summarize fails=count() by IPAddress, bin(TimeGenerated, 5m)
+| join kind=inner (
+    SigninLogs
+    | where ResultType == 0
+    | project IPAddress, TimeGenerated
+) on IPAddress
+| where fails >= 3 and TimeGenerated1
+  between (TimeGenerated .. TimeGenerated + 5m)</pre>
+            <label class="choice"><input type="radio" name="kql" value="B" /> Choose B</label>
+          </div>
+          <div class="email">
+            <h4>C</h4>
+<pre>SigninLogs
+| where ResultType == 0
+| summarize successes=count()</pre>
+            <label class="choice"><input type="radio" name="kql" value="C" /> Choose C</label>
           </div>
         </div>
-
         <div class="input-row">
           <button class="btn" id="c6_check">Check Answer</button>
           <button class="btn" data-hint="c6_hint">💡 Hint</button>
         </div>
-        <div class="hint" id="c6_hint">Prefer the smallest action set and the narrowest resource scope needed to perform the job.</div>
-
+        <div class="hint" id="c6_hint">Think about grouping failures by IP in a short time window, then confirming a success for that IP in the same window.</div>
         <div id="c6_flag" class="hidden">
-          <span class="flag">🔐 FLAG{LEAST_PRIVILEGE}</span>
+          <span class="flag">🧠 FLAG{SEQUENCE_DETECTED}</span>
         </div>
       </article>
 
-      <!-- Challenge 7: Integrity / SRI -->
+      <!-- Challenge 7 (NEW): Web Logs Hunt (user input) -->
       <article class="card" id="c7">
-        <div class="meta">Category: Integrity & Hardening • Difficulty: ★★★</div>
-        <h2>7) Integrity Check (Compute & verify SHA‑256)</h2>
-        <p>We pin third-party assets with a known SHA‑256. Compute the hash of the original content and verify it matches the expected value.</p>
-
-        <p class="small">Original content:</p>
-        <pre id="c7_src" aria-label="script.js">
-const version = "1.0.0";
-console.log("Hello, integrity!");
-        </pre>
-
+        <div class="meta">Category: Threat Hunting • Difficulty: ★★★</div>
+        <h2>7) Web Logs Hunt (Find the suspicious download)</h2>
+        <p>Review the access logs and submit the <strong>request path</strong> of the suspicious <em>large download</em> as <code>FLAG{...}</code>.
+          <br/>Example format: <code>FLAG{/path/file.ext}</code></p>
+<pre aria-label="access.log">
+198.51.100.23 - - [06/Mar/2026:09:14:02 -0500] "GET /login HTTP/1.1" 200 4821 "-" "Mozilla/5.0"
+203.0.113.77  - - [06/Mar/2026:09:16:41 -0500] "GET /robots.txt HTTP/1.1" 200 112 "-" "curl/8.0"
+203.0.113.77  - - [06/Mar/2026:09:17:12 -0500] "GET /admin HTTP/1.1" 302 0 "-" "curl/8.0"
+203.0.113.77  - - [06/Mar/2026:09:18:55 -0500] "GET /backup/weekly.tar.gz HTTP/1.1" 200 52428800 "-" "curl/8.0"
+10.77.0.5     - - [06/Mar/2026:09:20:01 -0500] "GET /health HTTP/1.1" 200 2 "-" "kube-probe/1.27"
+</pre>
         <div class="input-row">
-          <label style="display:flex;align-items:center;gap:6px;">
-            <input type="checkbox" id="c7_tamper" />
-            Simulate tamper (adds a space)
-          </label>
-          <button class="btn" id="c7_compute">Compute &amp; Verify</button>
           <button class="btn" data-hint="c7_hint">💡 Hint</button>
         </div>
-        <div class="hint" id="c7_hint">Subresource Integrity (SRI) uses a cryptographic hash (e.g., SHA‑256) to detect changes. Even a tiny change should break the match.</div>
-
-        <div class="hr"></div>
-        <p class="small">Expected (base64): <code id="c7_hash_expected">[will compute on load]</code></p>
-        <p class="small">Actual (base64): <code id="c7_hash_actual">[click compute]</code></p>
-
-        <div id="c7_flag" class="hidden">
-          <span class="flag">🧾 FLAG{INTEGRITY_VERIFIED}</span>
+        <div class="hint" id="c7_hint">Compare response sizes and filenames that often contain sensitive data. Non‑browser clients can be a clue.</div>
+        <div class="input-row">
+          <input id="c7_in" type="text" placeholder="e.g., FLAG{/backup/weekly.tar.gz}" />
+          <button class="btn good" data-submit="c7">Submit</button>
+          <span id="c7_status"></span>
         </div>
       </article>
 
@@ -382,13 +363,12 @@ console.log("Hello, integrity!");
 
     const expected = {
       c1: "FLAG{SOURCE_CODE_REVIEW}",
-      // Base64 in the config decodes to this:
-      c2: "FLAG{CONFIG_PRACTICES}",
+      c2: "FLAG{CONFIG_PRACTICES}",     // Base64 token decodes to this
       c3: "FLAG{10.10.10.13}",
       c4: "FLAG{SPOT_THE_PHISH}",
-      c5: "FLAG{SECURE_HEADERS}",
-      c6: "FLAG{LEAST_PRIVILEGE}",
-      c7: "FLAG{INTEGRITY_VERIFIED}"
+      c5: "FLAG{STRONG_TLS}",
+      c6: "FLAG{SEQUENCE_DETECTED}",
+      c7: "FLAG{/backup/weekly.tar.gz}" // user must enter this path wrapped in FLAG{...}
     };
 
     const solved = new Set();
@@ -466,27 +446,18 @@ console.log("Hello, integrity!");
       solved.clear();
       updateScore();
 
-      // Clear inputs & statuses
-      ["c1","c2","c3","c5"].forEach(id=>{
+      // Clear inputs & statuses for text-entry challenges
+      ["c1","c2","c3","c7"].forEach(id=>{
         const inp = $("#"+id+"_in");
         const st = $("#"+id+"_status");
         if (inp) inp.value = "";
         if (st) st.textContent = "";
       });
 
-      // Hide flags / sections that get revealed
+      // Hide dynamic reveals
       $("#c1_code")?.classList.add("hidden");
       $("#c4_flag")?.classList.add("hidden");
-      $("#c5_after")?.classList.add("hidden");
       $("#c6_flag")?.classList.add("hidden");
-      $("#c7_flag")?.classList.add("hidden");
-
-      // Reset integrity hash outputs and tamper checkbox
-      $("#c7_hash_actual").textContent = "[click compute]";
-      $("#c7_hash_expected").textContent = "[will compute on load]";
-      $("#c7_tamper").checked = false;
-      // Recompute expected for c7
-      computeC7Expected();
 
       // Reset solved styling & re-enable UI
       $$("#grid .card").forEach(c => c.classList.remove("done"));
@@ -545,66 +516,30 @@ console.log("Hello, integrity!");
       }
     });
 
-    // Challenge 5: apply headers
-    $("#c5_apply").addEventListener("click", ()=>{
-      $("#c5_after").classList.remove("hidden");
-      // auto-fill input for convenience
-      $("#c5_in").value = "FLAG{SECURE_HEADERS}";
+    // ===== Challenge 5 (NEW): TLS Hardening =====
+    $("#c5_check").addEventListener("click", ()=>{
+      const val = (document.querySelector('input[name="tls"]:checked')||{}).value;
+      if (val === "B") {
+        // Mark solved
+        solve("c5", "FLAG{STRONG_TLS}", null);
+        alert("Nice pick. Modern protocols & AEAD ciphers with forward secrecy are preferred.");
+      } else {
+        alert("Not quite. Think: modern protocols, forward secrecy, AEAD.");
+      }
     });
 
-    // ===== Challenge 6: Least Privilege =====
+    // ===== Challenge 6 (NEW): SIEM Tuning =====
     $("#c6_check").addEventListener("click", ()=>{
-      const val = (document.querySelector('input[name="iam"]:checked')||{}).value;
+      const val = (document.querySelector('input[name="kql"]:checked')||{}).value;
       if (val === "B") {
         $("#c6_flag").classList.remove("hidden");
-        solve("c6", "FLAG{LEAST_PRIVILEGE}", null);
+        solve("c6", "FLAG{SEQUENCE_DETECTED}", null);
       } else {
-        alert("Not quite. Minimize actions (GetObject) and scope (only the bucket's objects).");
+        alert("Close. You need a failure burst per IP and a success joined within the same time window.");
       }
     });
 
-    // ===== Challenge 7: Integrity / SRI =====
-    const C7_ORIGINAL = `const version = "1.0.0";
-console.log("Hello, integrity!");
-`;
-    let c7ExpectedB64 = null;
-
-    function ab2b64(buf){
-      let bin = "";
-      const bytes = new Uint8Array(buf);
-      for (const b of bytes) bin += String.fromCharCode(b);
-      return btoa(bin);
-    }
-
-    async function sha256Base64(str){
-      const enc = new TextEncoder().encode(str);
-      const digest = await crypto.subtle.digest("SHA-256", enc);
-      return ab2b64(digest);
-    }
-
-    async function computeC7Expected(){
-      c7ExpectedB64 = await sha256Base64(C7_ORIGINAL);
-      $("#c7_hash_expected").textContent = c7ExpectedB64;
-    }
-    computeC7Expected();
-
-    $("#c7_compute").addEventListener("click", async ()=>{
-      const tamper = $("#c7_tamper").checked;
-      const content = tamper ? C7_ORIGINAL + " " : C7_ORIGINAL; // tiny change
-      const actual = await sha256Base64(content);
-      $("#c7_hash_actual").textContent = actual;
-
-      if (actual === c7ExpectedB64 && !tamper) {
-        $("#c7_flag").classList.remove("hidden");
-        solve("c7", "FLAG{INTEGRITY_VERIFIED}", null);
-      } else if (tamper) {
-        alert("Tamper detected: hash mismatch (as intended). Uncheck tamper and verify again.");
-      } else {
-        alert("Hash mismatch. Ensure you’re hashing the original content exactly.");
-      }
-    });
-
-    // Submit handlers for text entries
+    // Submit handlers for text entries (c1, c2, c3, c7)
     $$("button[data-submit]").forEach(btn=>{
       btn.addEventListener("click", ()=>{
         const id = btn.getAttribute("data-submit");
