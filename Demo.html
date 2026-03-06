@@ -1,0 +1,290 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>CTF Demo (3 Challenges)</title>
+<style>
+  :root {
+    --bg:#0f172a; --panel:#111827; --card:#1f2937;
+    --accent:#22d3ee; --ok:#34d399; --warn:#fbbf24; --bad:#f87171;
+    --text:#e5e7eb; --muted:#94a3b8;
+  }
+  *{box-sizing:border-box} body{margin:0;font-family:system-ui,Segoe UI,Roboto,Arial;background:#0f172a;color:var(--text)}
+  header{position:sticky;top:0;z-index:10;background:#0f172acc;backdrop-filter:blur(8px);border-bottom:1px solid #1f2a44;padding:16px}
+  .wrap{max-width:1000px;margin:0 auto}
+  h1{margin:0;font-size:20px;display:flex;gap:8px;align-items:center}
+  .badge{font-size:12px;color:var(--muted);border:1px solid #2b3a57;border-radius:999px;padding:2px 8px}
+  .top{display:flex;gap:10px;flex-wrap:wrap;margin-top:8px}
+  .pill{background:#0b1221;border:1px solid #24324d;border-radius:10px;padding:8px 12px;display:flex;gap:6px;align-items:center}
+  .pill strong{color:var(--accent)}
+  .btn{appearance:none;border:1px solid #274064;background:#0d2432;color:#dff6ff;padding:8px 12px;border-radius:10px;cursor:pointer}
+  .btn:hover{background:#103045}
+  .grid{display:grid;gap:14px;grid-template-columns:repeat(12,1fr);padding:16px}
+  .card{grid-column:span 12;background:linear-gradient(180deg,#1b2538,#121a2b);border:1px solid #23324f;border-radius:12px;padding:14px}
+  @media (min-width:900px){.half{grid-column:span 6}}
+  .meta{font-size:12px;color:#a5b3cf;margin-bottom:6px}
+  .hint{display:none;margin-top:8px;font-size:13px;background:#0e2233;border:1px dashed #2a4761;border-radius:10px;padding:10px;color:#cee6ff}
+  .input-row{display:flex;gap:8px;margin-top:10px;flex-wrap:wrap}
+  input[type="text"]{background:#0a1524;border:1px solid #263a59;color:#eaf6ff;border-radius:10px;padding:8px;min-width:260px}
+  pre,code{background:#0b1221;border:1px solid #24324d;color:#e2f1ff;border-radius:10px;padding:10px;overflow:auto}
+  .ok{color:var(--ok)} .bad{color:var(--bad)}
+  .flag{display:inline-flex;gap:6px;align-items:center;background:#0d2d33;border:1px solid #2b6a70;color:#aef1f4;padding:6px 10px;border-radius:8px;font-family:ui-monospace,Consolas,monospace}
+  .done{opacity:.6;position:relative}
+  .done:after{content:"Solved";position:absolute;top:10px;right:10px;font-size:11px;background:#0a2a1e;color:#9debc7;border:1px solid #2b6a59;border-radius:6px;padding:2px 6px}
+  .hidden{display:none!important}
+  footer{color:#9fb3d1;font-size:12px;padding:6px 16px 20px}
+  .celebrate{position:fixed;inset:0;background:#0008;display:none;justify-content:center;align-items:center;pointer-events:none}
+  .celebrate .box{background:#08131f;border:1px solid #1c314d;border-radius:14px;padding:26px;max-width:520px;text-align:center}
+</style>
+</head>
+<body>
+  <header>
+    <div class="wrap">
+      <h1>CTF Demo <span class="badge">3 quick challenges</span></h1>
+      <div class="top">
+        <div class="pill"><strong>⏱ Time:</strong> <span id="time">03:00</span></div>
+        <div class="pill"><strong>🏁 Flags:</strong> <span id="score">0</span>/<span id="total">3</span></div>
+        <button class="btn" id="startBtn">Start Demo</button>
+        <button class="btn" id="resetBtn">Reset</button>
+      </div>
+    </div>
+  </header>
+
+  <main class="wrap">
+    <section class="grid" id="grid">
+
+      <!-- Demo 1: Code Review -->
+      <article class="card half" id="d1">
+        <div class="meta">Category: Secure SDLC • Difficulty: ★☆☆</div>
+        <h2>1) Code Review (Find the comment)</h2>
+        <p>Flags sometimes hide in comments. Inspect the mock file and submit the flag.</p>
+        <div class="input-row">
+          <button class="btn" id="d1_view">Open <code>app.js</code></button>
+          <button class="btn" data-hint="d1_hint">💡 Hint</button>
+        </div>
+        <div class="hint" id="d1_hint">Think “view source” or scan comments in the code panel.</div>
+        <pre id="d1_code" class="hidden" aria-label="app.js">
+/**
+ * Demo module (safe to show publicly)
+ * TODO: rotate demo keys yearly
+ * DEMO{VIEW_SOURCE}
+ */
+export function go(){ return "ok"; }
+        </pre>
+        <div class="input-row">
+          <input id="d1_in" type="text" placeholder="Paste the flag e.g., DEMO{...}" />
+          <button class="btn" data-submit="d1">Submit</button>
+          <span id="d1_status"></span>
+        </div>
+      </article>
+
+      <!-- Demo 2: Base64 -->
+      <article class="card half" id="d2">
+        <div class="meta">Category: Configuration • Difficulty: ★☆☆</div>
+        <h2>2) Config Hygiene (Decode Base64)</h2>
+        <p>Decode the token in this config and submit the result in <code>DEMO{...}</code> format.</p>
+        <pre id="d2_cfg" aria-label="config.json">[loading...]</pre>
+        <div class="input-row">
+          <button class="btn" id="d2_decode">Decode token</button>
+          <button class="btn" data-hint="d2_hint">💡 Hint</button>
+        </div>
+        <div class="hint" id="d2_hint">The alphabet (A–Z, a–z, 0–9, +, /, =) is a clue. Use a decoder or the button.</div>
+        <div class="input-row">
+          <input id="d2_in" type="text" placeholder="Paste the decoded flag e.g., DEMO{...}" />
+          <button class="btn" data-submit="d2">Submit</button>
+          <span id="d2_status"></span>
+        </div>
+      </article>
+
+      <!-- Demo 3: Phishing -->
+      <article class="card" id="d3">
+        <div class="meta">Category: Security Awareness • Difficulty: ★☆☆</div>
+        <h2>3) Phishing Check (Pick the risky email)</h2>
+        <p>Select the phishing email. Spotting it reveals the flag.</p>
+        <div class="grid" style="gap:10px;grid-template-columns:repeat(12,1fr);">
+          <div class="card" style="grid-column:span 12;background:#0b1221;padding:10px;">
+            <div style="display:flex;gap:10px;flex-wrap:wrap">
+              <div class="email" style="flex:1 1 280px;min-width:260px;">
+                <h4>Subject: Payroll password reset urgently required</h4>
+                <p>From: Payroll Team &lt;support@secure-payroll.example&gt;</p>
+                <p>Link: <span class="bad">http://payroll.example-login.help</span></p>
+                <label class="input-row"><input type="radio" name="phish" value="A" /> This is phishing</label>
+              </div>
+              <div class="email" style="flex:1 1 280px;min-width:260px;">
+                <h4>Subject: Quarterly All-Hands Notes</h4>
+                <p>From: HR Comms &lt;hr@corp.example&gt;</p>
+                <p>Attachment: <span>.pdf (signed)</span></p>
+                <label class="input-row"><input type="radio" name="phish" value="B" /> This is phishing</label>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="input-row">
+          <button class="btn" id="d3_check">Check Answer</button>
+          <button class="btn" data-hint="d3_hint">💡 Hint</button>
+        </div>
+        <div class="hint" id="d3_hint">Look for mismatched sender vs domain, urgency wording, and odd-looking URLs.</div>
+        <div id="d3_flag" class="hidden" style="margin-top:8px">
+          <span class="flag">🎯 DEMO{AWARENESS}</span>
+        </div>
+      </article>
+
+    </section>
+    <footer class="wrap">Tip: Flags use <code>DEMO{...}</code> in this showcase. Your real game uses <code>FLAG{...}</code>.</footer>
+  </main>
+
+  <!-- Finish modal -->
+  <div class="celebrate" id="celebrate" role="dialog" aria-modal="true">
+    <div class="box">
+      <h3>🎉 Demo complete!</h3>
+      <p>All demo flags found. Ready for the real CTF.</p>
+      <div class="input-row" style="justify-content:center">
+        <button class="btn" onclick="resetGame()">Run Again</button>
+        <button class="btn" onclick="document.getElementById('celebrate').style.display='none'">Close</button>
+      </div>
+    </div>
+  </div>
+
+<script>
+  // ------- Settings -------
+  const GAME_SECONDS = 3 * 60; // 3-minute demo
+  const TOTAL_FLAGS = 3;
+
+  // Expected demo flags
+  const expected = {
+    d1: "DEMO{VIEW_SOURCE}",
+    d2: "DEMO{BASE64}",
+    d3: "DEMO{AWARENESS}"
+  };
+
+  // Utility
+  const $  = sel => document.querySelector(sel);
+  const $$ = sel => Array.from(document.querySelectorAll(sel));
+  const solved = new Set();
+  let remaining = GAME_SECONDS, running = false, timerId = null;
+
+  // Initialize config block for Demo 2 (generate Base64 dynamically to avoid typos)
+  function renderD2Config() {
+    const token = btoa(expected.d2);
+    const cfg = {
+      appName: "demo-ctf",
+      env: "showcase",
+      token
+    };
+    $("#d2_cfg").textContent = JSON.stringify(cfg, null, 2);
+  }
+
+  // Timer
+  function fmt(sec){const m=String(Math.floor(sec/60)).padStart(2,'0');const s=String(sec%60).padStart(2,'0');return `${m}:${s}`;}
+  function start(){ if(running) return; running = true;
+    timerId = setInterval(()=>{
+      remaining--; $("#time").textContent = fmt(remaining);
+      if(remaining<=0){ stop(); endGame(); }
+    },1000);
+  }
+  function stop(){ running = false; clearInterval(timerId); timerId = null; }
+  function endGame(){
+    $$("#grid .card").forEach(c=>c.classList.add("done"));
+    $$("#grid button, #grid input").forEach(el=>el.disabled=true);
+    $("#time").textContent = "00:00";
+  }
+
+  function updateScore(){
+    $("#score").textContent = solved.size;
+    if(solved.size >= TOTAL_FLAGS){
+      stop();
+      $("#celebrate").style.display = "flex";
+    }
+  }
+
+  function resetGame(){
+    stop(); running=false; remaining = GAME_SECONDS; $("#time").textContent = fmt(remaining);
+    solved.clear(); updateScore();
+    // Clear text inputs/status
+    ["d1","d2"].forEach(id=>{
+      $("#"+id+"_in").value = "";
+      $("#"+id+"_status").textContent = "";
+    });
+    // Hide reveal sections
+    $("#d1_code").classList.add("hidden");
+    $("#d3_flag").classList.add("hidden");
+    // Re-enable UI and styling
+    $$("#grid .card").forEach(c=>c.classList.remove("done"));
+    $$("#grid button, #grid input").forEach(el=>el.disabled=false);
+    $("#celebrate").style.display = "none";
+    renderD2Config();
+  }
+
+  // Wire UI
+  $("#startBtn").addEventListener("click", start);
+  $("#resetBtn").addEventListener("click", resetGame);
+  $("#total").textContent = TOTAL_FLAGS;
+
+  // Hint toggles
+  $$("button[data-hint]").forEach(btn=>{
+    btn.addEventListener("click", ()=>{
+      const id = btn.getAttribute("data-hint");
+      const el = $("#"+id);
+      if(!el) return; el.style.display = (el.style.display==="block"?"none":"block");
+    });
+  });
+
+  // Demo 1: show code
+  $("#d1_view").addEventListener("click", ()=>{
+    $("#d1_code").classList.toggle("hidden");
+  });
+
+  // Demo 2: decode token
+  $("#d2_decode").addEventListener("click", ()=>{
+    try{
+      const text = $("#d2_cfg").textContent;
+      const m = text.match(/"token":\s*"([^"]+)"/);
+      if(m){
+        const decoded = atob(m[1]);
+        alert("Decoded token: " + decoded);
+      }
+    }catch(e){ alert("Could not decode. Try manual Base64."); }
+  });
+
+  // Demo 3: phishing
+  $("#d3_check").addEventListener("click", ()=>{
+    const val = (document.querySelector('input[name="phish"]:checked')||{}).value;
+    if(val==="A"){
+      $("#d3_flag").classList.remove("hidden");
+      solve("d3", "DEMO{AWARENESS}", null);
+    } else {
+      alert("Not quite—check the sender/domain and URL pattern.");
+    }
+  });
+
+  // Generic submit
+  $$("button[data-submit]").forEach(btn=>{
+    btn.addEventListener("click", ()=>{
+      const id = btn.getAttribute("data-submit");
+      const val = ($("#"+id+"_in").value||"").trim();
+      solve(id, val, $("#"+id+"_status"));
+    });
+  });
+
+  function solve(id, val, statusEl){
+    if(solved.has(id)) return;
+    const ok = (val||"").trim() === expected[id];
+    if(ok){
+      solved.add(id);
+      document.getElementById(id).classList.add("done");
+      if(statusEl) statusEl.innerHTML = `<span class="ok">✅ Correct</span>`;
+      updateScore();
+    } else {
+      if(statusEl) statusEl.innerHTML = `<span class="bad">❌ Try again</span>`;
+    }
+  }
+
+  // Boot
+  $("#time").textContent = fmt(remaining);
+  renderD2Config();
+  updateScore();
+</script>
+</body>
+</html>
+``
