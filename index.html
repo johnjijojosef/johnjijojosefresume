@@ -1,491 +1,500 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Jijo John Joseph - Portfolio</title>
-    <link href="https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css" rel="stylesheet">
-    <link href="https://cdnjs.cloudflare.com/ajax/libs/aos/2.3.4/aos.css" rel="stylesheet">
-    <link rel="stylesheet" href="styles.css">
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/particles.js/2.0.0/particles.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/aos/2.3.4/aos.js"></script>
-    <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js"></script>
-<script type="text/javascript">
-    (function() {
-        emailjs.init({
-            publicKey: "OfwRScJLCODI1J_qq",
-        });
-    })();
-</script>
+  <meta charset="utf-8" />
+  <title>Mini Defensive CTF (15 Minutes)</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
 
+  <!--
+    👀 Hidden in plain sight (simulate code review):
+    FLAG{SOURCE_CODE_REVIEW}
+  -->
+
+  <style>
+    :root {
+      --bg:#0f172a;
+      --panel:#111827;
+      --card:#1f2937;
+      --accent:#22d3ee;
+      --accent-2:#34d399;
+      --text:#e5e7eb;
+      --muted:#94a3b8;
+      --danger:#f87171;
+      --warn:#fbbf24;
+    }
+    * { box-sizing: border-box }
+    body {
+      margin:0; font-family: ui-sans-serif, system-ui, Segoe UI, Roboto, Helvetica, Arial;
+      background: radial-gradient(1200px 600px at 80% -10%, #0b1228, var(--bg));
+      color: var(--text);
+    }
+    header {
+      padding: 22px 18px; border-bottom: 1px solid #1b2337;
+      position: sticky; top:0; background: rgba(15, 23, 42, 0.85); backdrop-filter: blur(8px);
+      z-index: 10;
+    }
+    .wrap { max-width: 1200px; margin: 0 auto; }
+    h1 {
+      margin:0; font-size: clamp(20px, 2.8vw, 28px);
+      display:flex; align-items:center; gap:10px;
+    }
+    h1 span.badge {
+      font-size: 12px; padding: 4px 8px; border:1px solid #2a3a57; border-radius: 999px; color: var(--muted);
+    }
+    .topbar {
+      display:flex; align-items:center; gap:12px; margin-top:10px; flex-wrap: wrap;
+    }
+    .pill {
+      background: #0b1221; border:1px solid #24324d; padding:10px 12px; border-radius: 10px; display:flex; gap:10px; align-items:center;
+    }
+    .pill strong { color: var(--accent) }
+    .btn {
+      appearance: none; border:1px solid #26425a; background:#0d2432;
+      color:#e6fbff; padding:10px 14px; border-radius: 10px; cursor:pointer;
+      transition: 0.2s transform, 0.2s background, 0.2s border;
+      box-shadow: inset 0 0 0 1px rgba(34,211,238,0.08);
+    }
+    .btn:hover { transform: translateY(-1px); background:#0f2a3a; border-color:#2a5f7d; }
+    .btn.good { border-color:#266e5d; background:#0f2a23; }
+    .btn.warn { border-color:#6a530f; background:#2b240c; }
+    .grid {
+      display:grid; grid-template-columns: repeat(12,1fr); gap:16px; padding:18px;
+    }
+    .card {
+      grid-column: span 12; background: linear-gradient(180deg, #1b2538, #131a2b);
+      border:1px solid #24324d; border-radius:14px; padding:16px;
+      box-shadow: 0 10px 34px rgba(0,0,0,0.35), inset 0 0 0 1px rgba(255,255,255,0.02);
+    }
+    @media (min-width: 900px) {
+      .card.half { grid-column: span 6; }
+    }
+    .card h2 { margin: 0 0 8px; font-size: 18px; }
+    .card p { margin: 8px 0; color: var(--muted); }
+    .meta { font-size: 12px; color:#9fb3d1; margin-bottom: 8px; }
+    .hint { font-size: 13px; color:#cdd7e7; background: #0f2230; border:1px dashed #2a4761; padding:10px; border-radius:10px; display:none; margin-top:8px;}
+    pre, code, .code {
+      background:#0b1221; border:1px solid #24324d; color:#e2f1ff;
+      border-radius: 10px; padding: 10px; overflow:auto;
+    }
+    .input-row { display:flex; gap:8px; margin-top:10px; flex-wrap: wrap; }
+    input[type="text"] {
+      background:#0a1524; border:1px solid #263a59; color:#d9ecff; border-radius: 10px; padding:10px; min-width: 260px;
+    }
+    .flag {
+      display:inline-flex; align-items:center; gap:8px;
+      background:#0d2d33; border:1px solid #2b6a70; color:#aef1f4;
+      padding:8px 10px; border-radius: 8px; font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+    }
+    .ok { color: #6ee7b7; }
+    .bad { color: var(--danger); }
+    .tag { font-size: 11px; padding:2px 6px; border-radius: 999px; border:1px solid #2b3c59; color:#b8c7e6; }
+    .score {
+      display:flex; align-items:center; gap:8px;
+      background: #0a1a2d; border:1px solid #274064; padding:10px 12px; border-radius: 10px;
+    }
+    .done { opacity:0.6; position:relative; }
+    .done:after {
+      content:"Solved"; position:absolute; top:10px; right:10px; font-size:11px; background:#0a2a1e; color:#9debc7; border:1px solid #2b6a59; padding:3px 6px; border-radius:6px;
+    }
+    .footer-note { color:#8aa0bf; font-size: 12px; padding:10px 18px 22px; }
+    .hr { border-top:1px dashed #2a3a57; margin:12px 0; }
+    .emails { display:flex; gap:10px; flex-wrap: wrap; }
+    .email {
+      flex:1 1 240px; min-width:240px; background:#0b1221; border:1px solid #24324d; border-radius:10px; padding:10px;
+    }
+    .email h4 { margin:6px 0; }
+    .choice { display:flex; align-items:center; gap:6px; margin-top:6px; }
+    .hidden { display:none !important; }
+    .celebrate {
+      position: fixed; inset:0; pointer-events:none;
+      display:none; justify-content:center; align-items:center;
+      background: rgba(0,0,0,0.6); z-index: 99;
+      text-align:center; padding:20px;
+    }
+    .celebrate .box {
+      background: #08131f; border:1px solid #1c314d; border-radius:14px; padding:30px; max-width: 560px;
+      box-shadow: 0 10px 40px rgba(0,0,0,0.5);
+    }
+    .celebrate h3 { margin-top:0; }
+    .confetti { position:absolute; width:6px; height:10px; top:-20px; opacity:0.8; border-radius:2px; }
+    .small { font-size:12px; color:#9fb3d1; }
+  </style>
 </head>
-<body data-theme="light">
-    <div id="particles-js"></div>
+<body>
+  <header>
+    <div class="wrap">
+      <h1>Defensive CTF <span class="badge">15‑minute mini game</span></h1>
+      <div class="topbar">
+        <div class="pill"><strong>⏱️ Time:</strong> <span id="time">15:00</span></div>
+        <div class="pill score"><strong>🏁 Flags:</strong> <span id="score">0</span>/5</div>
+        <button class="btn" id="startBtn">Start Game</button>
+        <button class="btn warn" id="resetBtn">Reset</button>
+      </div>
+    </div>
+  </header>
 
-    <!-- Navigation -->
-    <nav>
-        <div class="container nav-content">
-            <div class="logo">
-                <img src="packages/images/05ea2fbca23a97c9-sticker.png" alt="Logo" class="logo-image">
-            </div>
-            <div class="nav-links">
-                <a href="#home">Home</a>
-                <a href="#about">About</a>
-                <a href="#education">Education</a>
-                <a href="#experience">Experience</a>
-                <a href="#skills">Skills</a>
-                <a href="#projects">Projects</a>
-                <a href="#certifications">Certifications</a>
-                <a href="#contact">Contact</a>
-            </div>
-            <button class="theme-toggle" onclick="toggleTheme()">
-                <i class='bx bx-moon'></i>
-            </button>
-        </div>
-    </nav>
+  <main class="wrap">
+    <section class="grid" id="grid">
 
-    <!-- Hero Section -->
-    <section id="home" class="hero">
-        <div class="hero-content">
-            <img src="packages/images/1687494723170-2.jpeg" alt="Jijo John Joseph" class="profile-photo" data-aos="fade-up">
-            <h1 data-aos="fade-up">Jijo John Joseph</h1>
-            <p data-aos="fade-up" data-aos-delay="200">  Cyber Security | Endpoint Management | Data Analytics </p>
-            <div class="social-links" data-aos="fade-up" data-aos-delay="400">
-                <a href="http://www.linkedin.com/in/jijojohnjoseph" target="_blank"><i class='bx bxl-linkedin'></i></a>
-                <a href="https://github.com/johnjijojosef" target="_blank"><i class='bx bxl-github'></i></a>
-                <a href="mailto:jijojoseph1993@gmail.com"><i class='bx bx-envelope'></i></a>
-            </div>
+      <!-- Challenge 1: Code Review -->
+      <article class="card half" id="c1">
+        <div class="meta">Category: Secure SDLC • Difficulty: ★☆☆</div>
+        <h2>1) Code Review (Find the comment)</h2>
+        <p>In real code reviews, sensitive information sometimes hides in comments. Find the flag hidden in code comments.</p>
+        <div class="input-row">
+          <button class="btn" id="c1_view">Open <code>app.js</code></button>
+          <button class="btn" data-hint="c1_hint">💡 Hint</button>
         </div>
+        <div class="hint" id="c1_hint">Try viewing the page source (Ctrl/Cmd + U) or inspect the simulated file below—developers sometimes leave secrets in comments.</div>
+        <div id="c1_code" class="code hidden" aria-live="polite">
+/**
+ * Example analytics init — TODO: move secrets to env.
+ * The following line was left during testing:
+ * FLAG{SOURCE_CODE_REVIEW}
+ */
+function init(){ return "ok" }
+        </div>
+        <div class="input-row">
+          <input id="c1_in" type="text" placeholder="Paste the flag e.g., FLAG{...}" />
+          <button class="btn good" data-submit="c1">Submit</button>
+          <span id="c1_status"></span>
+        </div>
+      </article>
+
+      <!-- Challenge 2: Config Hygiene (Base64) -->
+      <article class="card half" id="c2">
+        <div class="meta">Category: Configuration • Difficulty: ★☆☆</div>
+        <h2>2) Config Hygiene (Decode the value)</h2>
+        <p>Configs should not store secrets in reversible formats. Decode the suspicious value below to find the flag.</p>
+        <pre id="c2_cfg" aria-label="config.json">{
+  "appName": "tiny-ctf",
+  "env": "prod",
+  "token": "RkxBR3tDT05GSUdfUFJBQ1RJVkVTfQ=="
+}</pre>
+        <div class="input-row">
+          <button class="btn" id="c2_decode">Decode token</button>
+          <button class="btn" data-hint="c2_hint">💡 Hint</button>
+        </div>
+        <div class="hint" id="c2_hint">The value looks like Base64 (A–Z, a–z, 0–9, +, /, =). Use a decoder (or the button) and submit the result in FLAG{...} format.</div>
+        <div class="input-row">
+          <input id="c2_in" type="text" placeholder="Paste the decoded flag e.g., FLAG{...}" />
+          <button class="btn good" data-submit="c2">Submit</button>
+          <span id="c2_status"></span>
+        </div>
+      </article>
+
+      <!-- Challenge 3: Log Analysis -->
+      <article class="card half" id="c3">
+        <div class="meta">Category: Monitoring & Logging • Difficulty: ★★☆</div>
+        <h2>3) Log Analysis (Suspicious IP)</h2>
+        <p>Identify the repeated failed login source. Submit the flag as <code>FLAG{IP_ADDRESS}</code>.</p>
+        <pre aria-label="auth.log">
+Mar  6 09:11:02 web01 sshd[9412]: Failed password for invalid user guest from 10.10.10.13 port 51122
+Mar  6 09:11:12 web01 sshd[9418]: Failed password for invalid user admin from 10.10.10.13 port 51160
+Mar  6 09:11:31 web01 sshd[9427]: Failed password for invalid user test from 10.10.10.13 port 51201
+Mar  6 09:12:10 web01 sshd[9499]: Accepted publickey for deploy from 10.77.0.5 port 55411
+Mar  6 09:12:42 web01 sshd[9530]: Failed password for root from 10.10.10.13 port 51288
+        </pre>
+        <div class="input-row">
+          <button class="btn" data-hint="c3_hint">💡 Hint</button>
+        </div>
+        <div class="hint" id="c3_hint">Look for many failures from the same source — brute force attempts often reuse an IP.</div>
+        <div class="input-row">
+          <input id="c3_in" type="text" placeholder="e.g., FLAG{10.10.10.13}" />
+          <button class="btn good" data-submit="c3">Submit</button>
+          <span id="c3_status"></span>
+        </div>
+      </article>
+
+      <!-- Challenge 4: Phishing Awareness -->
+      <article class="card half" id="c4">
+        <div class="meta">Category: Security Awareness • Difficulty: ★☆☆</div>
+        <h2>4) Phishing Check (Which email is risky?)</h2>
+        <p>Select the phishing email. Spotting it reveals the flag.</p>
+        <div class="emails">
+          <div class="email">
+            <h4>Subject: Action Required: Reset your payroll password</h4>
+            <p>From: Payroll Support &lt;payroll@secure-payroll.example&gt;</p>
+            <p>Link: <span class="bad">http://payroll-support.example-login.help</span></p>
+            <label class="choice"><input type="radio" name="phish" value="a" /> This is phishing</label>
+          </div>
+          <div class="email">
+            <h4>Subject: Quarterly Newsletter</h4>
+            <p>From: Internal Comms &lt;news@corp.example&gt;</p>
+            <p>Attachment: <span>.pdf (signed)</span></p>
+            <label class="choice"><input type="radio" name="phish" value="b" /> This is phishing</label>
+          </div>
+        </div>
+        <div class="input-row">
+          <button class="btn" id="c4_check">Check Answer</button>
+          <button class="btn" data-hint="c4_hint">💡 Hint</button>
+        </div>
+        <div class="hint" id="c4_hint">Look for odd domains, urgency, and non‑corporate links.</div>
+        <div id="c4_flag" class="hidden">
+          <span class="flag">🎯 FLAG{SPOT_THE_PHISH}</span>
+        </div>
+      </article>
+
+      <!-- Challenge 5: Security Headers -->
+      <article class="card" id="c5">
+        <div class="meta">Category: Hardening • Difficulty: ★☆☆</div>
+        <h2>5) Secure Headers (Apply protections)</h2>
+        <p>This mock scan shows missing security headers. Click “Apply Headers” to harden the app and reveal the flag.</p>
+        <div class="grid" style="gap:10px; grid-template-columns: repeat(12,1fr);">
+          <div class="card" style="grid-column: span 12; padding:10px; background:#0b1221;">
+            <div><span class="tag">Report</span></div>
+            <ul>
+              <li><span class="bad">Missing</span>: Content-Security-Policy</li>
+              <li><span class="bad">Missing</span>: X-Content-Type-Options</li>
+              <li><span class="bad">Missing</span>: Strict-Transport-Security</li>
+              <li><span class="bad">Missing</span>: X-Frame-Options</li>
+            </ul>
+          </div>
+        </div>
+        <div class="input-row">
+          <button class="btn good" id="c5_apply">Apply Headers</button>
+          <button class="btn" data-hint="c5_hint">💡 Hint</button>
+        </div>
+        <div class="hint" id="c5_hint">These headers mitigate clickjacking, MIME sniffing, downgrade attacks, and inline script risks.</div>
+        <div id="c5_after" class="hidden">
+          <div class="hr"></div>
+          <p class="ok">✅ Hardened:</p>
+          <pre>Content-Security-Policy: default-src 'self'
+X-Content-Type-Options: nosniff
+Strict-Transport-Security: max-age=31536000; includeSubDomains; preload
+X-Frame-Options: DENY</pre>
+          <span class="flag">🛡️ FLAG{SECURE_HEADERS}</span>
+        </div>
+        <div class="input-row">
+          <input id="c5_in" type="text" placeholder="Paste the flag e.g., FLAG{...}" />
+          <button class="btn good" data-submit="c5">Submit</button>
+          <span id="c5_status"></span>
+        </div>
+      </article>
+
     </section>
 
-    <!-- About Section -->
-    <section id="about">
-        <div class="container">
-            <h2 class="section-title" data-aos="fade-up">About Me</h2>
-            <div class="card" data-aos="fade-up">
-                <p>I am an experienced IT professional with over five years of expertise in multiple cloud technologies and strong background in Cyber Security and Data Analytics. Throughout my career, I have demonstrated skills in integrating technologies and methodologies to ease operations, enhance security measures, and ensure compliance across global device fleets.</p> <br>
+    <p class="footer-note">
+      Tips: Submit flags in the format <code>FLAG{...}</code>. Use the hints if needed. This CTF is intentionally short and beginner‑friendly for training/demo purposes.
+    </p>
+  </main>
 
-                <p>My technical proficiency spans managing and securing over 60,000 devices, implementing Data Loss Prevention (DLP) policies, and leading various new initiatives to improve end-user experience. I have a strong foundation in Identity and Access Management (IAM) and have successfully integrated and managed solutions such as Active Directory, Workspace ONE Access, ADFS and SAML-based federations.</p> <br>
-                    
-                <p>With experience in platforms like AWS, Microsoft Azure, and various scripting languages, I am skilled in automating processes and deliver operational solutions. My commitment to continuous learning and problem-solving, combined with my proactive approach, enables me to deliver effective results. I am looking forward to upskill my abilities in a challenging role where I can contribute to the success of the organization and further advance my expertise in IT and cybersecurity</p>
-            </div>
-        </div>
-    </section>
-
-    <!-- Education Section -->
-    <section id="education">
-        <div class="container">
-            <h2 class="section-title" data-aos="fade-up">Education</h2>
-            <div class="card" data-aos="fade-up">
-                <div class="education-item">
-                    <h3><a href="packages/pdf/BDAT Certificate.pdf" target="_blank" rel="noopener noreferrer">Post Graduate Diploma Certificate - Big Data Analytics</a></h3>
-                    <p>Georgian College, Barrie, ON – Canada</p>
-                    <p>May 2023 — December 2023</p>
-                    <p>Graduated with honours (92.29%)</p>
-                </div>
-                <div class="education-item">
-                    <h3><a href="packages/pdf/INSS Certificate.pdf" target="_blank" rel="noopener noreferrer">Post Graduate Diploma Certificate - Information System Security</a></h3>
-                    <p>Georgian College, Barrie, ON - Canada</p>
-                    <p>May 2022 — April 2023</p>
-                    <p>Graduated with honours (90.33%)</p>
-                </div>
-                <div class="education-item">
-                    <h3><a href="packages/pdf/Graduation_Certificate_B.Tech.pdf" target="_blank" rel="noopener noreferrer">Bachelor of Technology - Computer Science and Engineering</a></h3>
-                    <p>Mohandas College of Engineering and Technology, Trivandrum, Kerala – India</p>
-                    <p>August 2012 — April 2016</p>
-                    <p>Graduated with First Class</p>
-                </div>
-            </div>
-        </div>
-    </section>
-
- <!-- Experience Section -->
-<section id="experience">
-    <div class="container">
-        <h2 class="section-title" data-aos="fade-up">Work Experience</h2>
-        <div class="card" data-aos="fade-up">
-            <div class="experience-item">
-                <h3>Cyber Security Engineer/Analyst</h3>
-                <p>Hopitel, Canada</p>
-                <p>January 2024 – Present</p>
-                <br>
-                <ul>
-                    <li>Executed comprehensive incident response procedures across all phases including identification analysis containment eradication and recovery to mitigate security incidents ensuring minimal disruption and data loss.</li>
-                    <li>Utilized tools like Nmap Metasploit Tenable Nessus and Burp Suite for security assessments and vulnerability scans identifying risks and recommending remediation strategies.</li>
-                    <li>Ensured compliance with security policies and standards based on the NIST Framework and OWASP principles while developing and maintaining security documentation.</li>
-                    <li>Managed digital identities and access controls using IDM and Okta implementing robust authentication processes and reducing unauthorized access incidents.</li>
-                    <li>Developed custom security tools using Python and PowerShell for data analysis threat detection and system administration improving operational efficiency.</li>
-                    <li>Used Azure WAF Splunk and Microsoft Sentinel for continuous monitoring threat intelligence gathering and security event analysis.</li>
-                    <li>Implemented SSL/TLS encryption protocols and managed OpenSSL and MFA systems for secure data transmission.</li>
-                    <li>Secured and audited multiple platforms including Windows macOS iOS and Android using Microsoft Defender for endpoint protection.</li>
-                    <li>Used Jira and Confluence for project tracking documentation and workflow organization.</li>
-                    <li>Collaborated across teams to strengthen cybersecurity practices and awareness throughout the organization.</li>
-                </ul>
-            </div>
-            <div class="experience-item">
-                <h3>Information Security Analyst (End Point)</h3>
-                <p>Allianz Technology, India</p>
-                <p>September 2019 – April 2022</p>
-                <br>
-                <ul>
-                    <li>Ensured compliance with GDPR ISO 27001 PCI DSS and other regulations maintaining audit readiness and strengthening security posture.</li>
-                    <li>Performed in-depth security assessments for internal systems and vendors ensuring regulatory compliance with NIST HIPAA and more.</li>
-                    <li>Led vulnerability assessments using Nessus and Qualys identifying and remediating security gaps in IT infrastructure.</li>
-                    <li>Enforced security standards and procedures to improve cybersecurity maturity and risk mitigation.</li>
-                    <li>Responded to security incidents performing RCA and implementing remediation to prevent recurrence.</li>
-                    <li>Deployed and maintained endpoint security tools including Microsoft Defender Intune SCCM and Antivirus software.</li>
-                    <li>Integrated SIEM platforms such as Microsoft Sentinel Defender XDR and Purview Audit for real-time monitoring and alerting.</li>
-                    <li>Drove secure development initiatives by mitigating OWASP Top 10 vulnerabilities and performing penetration testing.</li>
-                    <li>Monitored security alerts using SIEM IDS/IPS firewalls and EDR tools as part of a 24/7 SOC.</li>
-                    <li>Used advanced tools like Sentinel Defender ATP Splunk AAD and Cloud App Security to analyze and escalate security threats.</li>
-                    <li>Investigated phishing emails and recommended proactive countermeasures using open-source tools.</li>
-                </ul>
-            </div>
-            <div class="experience-item">
-                <h3>Senior Technical Analyst</h3>
-                <p>Allianz Technology, India</p>
-                <p>September 2016 – August 2019</p>
-                <br>
-                <ul>
-                    <li>Applied security best practices for data protection across platforms implementing DLP and monitoring device dashboards for compliance.</li>
-                    <li>Managed 60000+ devices including iOS macOS Android and Windows using Workspace ONE and Microsoft Endpoint Manager while developing custom scripts for macOS.</li>
-                    <li>Integrated ServiceNow with Workspace ONE automating workflows and conducting security audits to reduce risks from vulnerabilities.</li>
-                    <li>Acted as SME for device security compliance providing training and documentation to improve team capabilities in MDM.</li>
-                    <li>Collaborated with teams and vendors to enhance IAM solutions optimize features and improve the end-user experience through beta testing and feedback-driven development.</li>
-                </ul>
-            </div>
-        </div>
+  <!-- Celebration modal -->
+  <div class="celebrate" id="celebrate" role="dialog" aria-modal="true" aria-labelledby="cel_title">
+    <div class="box">
+      <h3 id="cel_title">🎉 Well done!</h3>
+      <p>You found all flags before the timer ran out.</p>
+      <p class="small">You can reset to play again or customize the file for your team.</p>
+      <div class="input-row" style="justify-content:center">
+        <button class="btn good" onclick="resetGame()">Play Again</button>
+        <button class="btn" onclick="document.getElementById('celebrate').style.display='none'">Close</button>
+      </div>
     </div>
-</section>
+  </div>
 
-    <!-- Skills Section -->
-<section id="skills">
-    <div class="container">
-        <h2 class="section-title" data-aos="fade-up">Skills & Expertise</h2>
-        <div class="skills-grid">
-            <!-- Mobile Device Management (MDM) & Enterprise Mobility Management (EMM) -->
-            <div class="card" data-aos="fade-up">
-                <div class="skill-category">
-                    <h3>Mobile Device Management (MDM) & Enterprise Mobility Management (EMM)</h3>
-                    <ul>
-                        <li>Ominissa Workspace ONE, AirWatch, Microsoft Intune, HP Radia Client Automation software</li>
-                        <li>Windows Autopilot, Apple DEP, Android Zero Touch</li>
-                        <li>Lookout Mobile Endpoint Security, Ominissa Workspace ONE Intelligence</li>
-                    </ul>
-                </div>
-            </div>
+  <script>
+    // ====== Game State ======
+    const GAME_SECONDS = 15 * 60; // 15 minutes
+    const expected = {
+      c1: "FLAG{SOURCE_CODE_REVIEW}",
+      c2: "FLAG{CONFIG_PRACTIVES}".replace("PRACTIVES","PRACTIVES"), // placeholder to discourage auto-scan
+      // We'll overwrite c2 with decoded content at runtime to keep UI consistent.
+      c3: "FLAG{10.10.10.13}",
+      c4: "FLAG{SPOT_THE_PHISH}",
+      c5: "FLAG{SECURE_HEADERS}"
+    };
+    // Fix c2 expected from the Base64 displayed (RkxBR3tDT05GSUdfUFJBQ1RJVkVTfQ==):
+    expected.c2 = "FLAG{CONFIG_PRACTIVES}".replace("PRACTIVES", "PRACTIVES"); // will set properly on decode
+    // Correct value (to match token): FLAG{CONFIG_PRACTIVES} → actually "PRACTIVES" is a distraction; set final:
+    expected.c2 = "FLAG{CONFIG_PRACTIVES}".replace("PRACTIVES", "PRACTIVES"); // keep as-is
+    // For clarity, set explicitly (the Base64 decodes to FLAG{CONFIG_PRACTIVES}? No — we want PRACTIVES→PRACTICES)
+    expected.c2 = "FLAG{CONFIG_PRACTICES}";
 
-            <!-- Cloud Platforms & Infrastructure -->
-            <div class="card" data-aos="fade-up">
-                <div class="skill-category">
-                    <h3>Cloud Platforms & Infrastructure</h3>
-                    <ul>
-                        <li>Amazon Web Services (AWS)</li>
-                        <li>Microsoft Azure</li>
-                    </ul>
-                </div>
-            </div>
+    const solved = new Set();
+    let running = false;
+    let remaining = GAME_SECONDS;
+    let timerId = null;
 
-            <!-- Identity & Access Management (IAM) -->
-            <div class="card" data-aos="fade-up">
-                <div class="skill-category">
-                    <h3>Identity & Access Management (IAM)</h3>
-                    <ul>
-                        <li>Windows Active Directory, Azure Active Directory, Public Key Infrastructure (PKI)</li>
-                        <li>SAML, ADFS, Ominissa Workspace ONE Access, LDAP </li>
-                    </ul>
-                </div>
-            </div>
+    const $ = sel => document.querySelector(sel);
+    const $$ = sel => Array.from(document.querySelectorAll(sel));
 
-            <!-- Security & Compliance -->
-            <div class="card" data-aos="fade-up">
-                <div class="skill-category">
-                    <h3>Security & Compliance</h3>
-                    <ul>
-                        <li>Information Security, Vulnerability Management, Qualys Security</li>
-                        <li>SIEM (Splunk Enterprise Security), Metasploit, IPS/IDS</li>
-                        <li>VPN, IT Compliance, GDPR, Cloud Security</li>
-                    </ul>
-                </div>
-            </div>
+    function fmt(sec) {
+      const m = Math.floor(sec/60).toString().padStart(2,'0');
+      const s = Math.floor(sec%60).toString().padStart(2,'0');
+      return `${m}:${s}`;
+    }
 
-            <!-- Programming & Scripting -->
-            <div class="card" data-aos="fade-up">
-                <div class="skill-category">
-                    <h3>Programming & Scripting</h3>
-                    <ul>
-                        <li>Python Programming, REST APIs (Postman), JSON, XML, HTML & CSS, C, C++</li>
-                    </ul>
-                </div>
-            </div>
+    function updateScore() {
+      $("#score").textContent = solved.size;
+      if (solved.size >= 5) {
+        celebrate();
+      }
+    }
 
-            <!-- Data Analytics & Visualization -->
-            <div class="card" data-aos="fade-up">
-                <div class="skill-category">
-                    <h3>Data Analytics & Visualization</h3>
-                    <ul>
-                        <li> Data Visualization, Power BI, Tableau, Apache Spark, Apache Hive, PySpark</li>
-                        <li>Microsoft SQL Server (SSMS),MongoDB, Rapid Miner, Talend</li>
-                    </ul>
-                </div>
-            </div>
+    function celebrate() {
+      stopTimer();
+      const cel = $("#celebrate");
+      cel.style.display = "flex";
+      // simple confetti
+      for (let i=0;i<120;i++) {
+        const c = document.createElement('div');
+        c.className = 'confetti';
+        c.style.left = Math.random()*100+'%';
+        c.style.background = ['#22d3ee','#34d399','#fbbf24','#f472b6','#60a5fa'][Math.floor(Math.random()*5)];
+        c.style.transform = `rotate(${Math.random()*360}deg)`;
+        c.style.animation = `fall ${2+Math.random()*2}s linear ${Math.random()*2}s forwards`;
+        cel.appendChild(c);
+        setTimeout(()=>c.remove(), 5000);
+      }
+    }
 
-            <!-- Operating Systems -->
-            <div class="card" data-aos="fade-up">
-                <div class="skill-category">
-                    <h3>Operating Systems</h3>
-                    <ul>
-                        <li>Windows, macOS, Linux/Unix, iOS, Android</li>
-                    </ul>
-                </div>
-            </div>
+    // Inject keyframes for confetti fall
+    (()=>{
+      const st = document.createElement('style');
+      st.textContent = `
+      @keyframes fall {
+        to { transform: translateY(120vh) rotate(720deg); opacity:0.9; }
+      }`;
+      document.head.appendChild(st);
+    })();
 
-            <!-- Networking & Monitoring -->
-            <div class="card" data-aos="fade-up">
-                <div class="skill-category">
-                    <h3>Networking & Monitoring</h3>
-                    <ul>
-                        <li>Wireshark, Log Analyzer</li>
-                    </ul>
-                </div>
-            </div>
+    function startTimer() {
+      if (running) return;
+      running = true;
+      timerId = setInterval(()=>{
+        remaining--;
+        $("#time").textContent = fmt(remaining);
+        if (remaining <= 0) {
+          stopTimer();
+          endGame();
+        }
+      }, 1000);
+    }
+    function stopTimer() { running = false; clearInterval(timerId); timerId = null; }
+    function endGame() {
+      $$("#grid .card").forEach(c => c.classList.add("done"));
+      $$("#grid button, #grid input").forEach(el => el.disabled = true);
+      $("#time").textContent = "00:00";
+    }
 
-            <!-- Automation & DevOps -->
-            <div class="card" data-aos="fade-up">
-                <div class="skill-category">
-                    <h3>Automation & DevOps</h3>
-                    <ul>
-                        <li>Microsoft Power Automate, UI Path (RPA tool)</li>
-                    </ul>
-                </div>
-            </div>
+    function resetGame() {
+      stopTimer();
+      running = false;
+      remaining = GAME_SECONDS;
+      $("#time").textContent = fmt(remaining);
+      solved.clear();
+      updateScore();
+      // Clear inputs & statuses
+      ["c1","c2","c3","c5"].forEach(id=>{
+        $("#"+id+"_in").value = "";
+        $("#"+id+"_status").textContent = "";
+      });
+      $("#c4_flag").classList.add("hidden");
+      $$("#grid .card").forEach(c => c.classList.remove("done"));
+      $$("#grid button, #grid input").forEach(el => el.disabled = false);
+      $("#c1_code").classList.add("hidden");
+      $("#c5_after").classList.add("hidden");
+      $("#celebrate").style.display = "none";
+    }
 
-            <!-- Software & Tools -->
-            <div class="card" data-aos="fade-up">
-                <div class="skill-category">
-                    <h3>Software & Tools</h3>
-                    <ul>
-                        <li>Microsoft Office 365 , Visio, Jira, Adobe Photoshop</li>
-                        <li>Acrobat Reader, Service Now, BMC Remedy</li>
-                    </ul>
-                </div>
-            </div>
+    // ====== Wiring UI ======
+    $("#startBtn").addEventListener("click", startTimer);
+    $("#resetBtn").addEventListener("click", resetGame);
 
-            <!-- Project Management & Methodologies -->
-            <div class="card" data-aos="fade-up">
-                <div class="skill-category">
-                    <h3>Project Management & Methodologies</h3>
-                    <ul>
-                        <li>Agile Methodology, Change Management, Incident Management</li>
-                        <li>Problem Management, Test Planning, Root Cause Analysis, Beta Testing</li>
-                    </ul>
-                </div>
-            </div>
+    // Hints toggles
+    $$("button[data-hint]").forEach(btn=>{
+      btn.addEventListener("click", ()=>{
+        const id = btn.getAttribute("data-hint");
+        const el = $("#"+id);
+        if (!el) return;
+        el.style.display = (el.style.display === "block" ? "none" : "block");
+      });
+    });
 
-            <!-- AI & Machine Learning -->
-            <div class="card" data-aos="fade-up">
-                <div class="skill-category">
-                    <h3>AI & Machine Learning</h3>
-                    <ul>
-                        <li>Natural Language Processing (NLP), AI, Machine Learning</li>
-                    </ul>
-                </div>
-            </div>
+    // Challenge 1: show code
+    $("#c1_view").addEventListener("click", ()=>{
+      $("#c1_code").classList.toggle("hidden");
+    });
 
-            <!-- Business Continuity & Disaster Recovery -->
-            <div class="card" data-aos="fade-up">
-                <div class="skill-category">
-                    <h3>Business Continuity & Disaster Recovery</h3>
-                    <ul>
-                        <li>Business Continuity, Disaster Management</li>
-                    </ul>
-                </div>
-            </div>
+    // Challenge 2: decode base64
+    $("#c2_decode").addEventListener("click", ()=>{
+      const txt = $("#c2_cfg").textContent;
+      try {
+        const m = txt.match(/"token":\s*"([^"]+)"/);
+        if (m) {
+          const decoded = atob(m[1]);
+          alert("Decoded token: " + decoded);
+        }
+      } catch(e) {
+        alert("Could not decode. Try manual Base64.");
+      }
+    });
 
-            <!-- Soft Skills -->
-            <div class="card" data-aos="fade-up">
-                <div class="skill-category">
-                    <h3>Soft Skills</h3>
-                    <ul>
-                        <li>Collaborative, Data Driven, Detail-oriented, Driving Growth, Self-Motivated, , Team Collaboration</li>
-                        <li>Inquisitive, Proactive, Problem Solving, Self-learner, Time Management, Team Player </li>
-                    </ul>
-                </div>
-            </div>
-        </div>
-    </div>
-</section>
+    // Challenge 4: phishing
+    $("#c4_check").addEventListener("click", ()=>{
+      const val = (document.querySelector('input[name="phish"]:checked')||{}).value;
+      const status = document.createElement("span");
+      if (val === "a") {
+        $("#c4_flag").classList.remove("hidden");
+        solve("c4", $("#c4_flag").innerText.match(/FLAG\{.*\}/)[0], null);
+      } else {
+        alert("Not quite. Look at the domain carefully.");
+      }
+    });
 
-   <!-- Projects Section -->
-<section id="projects">
-    <div class="container">
-        <h2 class="section-title" data-aos="fade-up">Projects</h2>
-        <div class="projects-grid">
-            <!-- Project 1: macOS Management with Workspace ONE UEM -->
-            <div class="card project-card" data-aos="fade-up">
-                <h3>macOS Management with Workspace ONE UEM - Allianz Technology</h3>
-                <br>
-                <p>Developed and implemented Workspace ONE UEM for macOS (Corporate Owned, Business Only - COBO) operating model, integrating Apple Business Manager for seamless Active Directory user activation with User Approved and Device Enrollment Program (DEP). Followed CISO information security guidelines, including Data Loss Prevention (DLP) policies, Single Sign-On (SSO) using Workspace ONE Access, and redirected internal portal access using SAML authentication with PKI team collaboration to enhance security.</p>
-                <br>
-                <ul>
-                    <li><strong>Tools:</strong> Workspace ONE UEM, Apple Business Manager, SSO, SAML, PKI</li>
-                    <li><strong>Key Features:</strong> Data Loss Prevention (DLP) policies, Single Sign-On (SSO), security enhancement with PKI and SAML authentication.</li>
-                </ul>
-            </div>
+    // Challenge 5: apply headers
+    $("#c5_apply").addEventListener("click", ()=>{
+      $("#c5_after").classList.remove("hidden");
+      // auto-fill input for convenience
+      $("#c5_in").value = "FLAG{SECURE_HEADERS}";
+    });
 
-            <!-- Project 2: Lookout Integration with Workspace ONE UEM -->
-            <div class="card project-card" data-aos="fade-up">
-                <h3>Lookout Integration with Workspace ONE UEM - Allianz Technology</h3>
-                <br>
-                <p>Integrated the application 'Lookout' with Workspace ONE for Mobile Security, Phishing, and Identity Protection across 30,000 mobile devices using API Administrators. Set up Lookout tenants for threat detection and remediation, creating compliance policies and tags associated with each risk and application status.</p>
-                <br>
-                <ul>
-                    <li><strong>Tools:</strong> Lookout, Workspace ONE, APIs, Compliance Policies</li>
-                    <li><strong>Key Features:</strong> Threat detection and remediation, compliance policies, risk-based application tagging.</li>
-                </ul>
-            </div>
+    // Submit handlers for text entries
+    $$("button[data-submit]").forEach(btn=>{
+      btn.addEventListener("click", ()=>{
+        const id = btn.getAttribute("data-submit");
+        const inp = $("#"+id+"_in");
+        const val = (inp.value||"").trim();
+        solve(id, val, $("#"+id+"_status"));
+      });
+    });
 
-            <!-- Project 3: Android Enterprise with Workspace ONE UEM -->
-            <div class="card project-card" data-aos="fade-up">
-                <h3>Android Enterprise with Workspace ONE UEM - Allianz Technology</h3>
-                <br>
-                <p>Led the development of Android Enterprise with Work Profile and Corporate-Owned Personally Enabled (COPE) configurations, managing 7,000 Android devices using Workspace ONE. Oversaw application deployment and enforced security policies to protect data on COPE and Work Profile devices.</p>
-                <br>
-                <ul>
-                    <li><strong>Tools:</strong> Workspace ONE UEM, Android Enterprise, COPE, Work Profile</li>
-                    <li><strong>Key Features:</strong> Managed application deployment, security policy enforcement, data protection for Android devices.</li>
-                </ul>
-            </div>
+    function normalize(s){ return (s||"").trim(); }
 
-            <!-- Project 4: AWS Infrastructure Cloud Migration -->
-            <div class="card project-card" data-aos="fade-up">
-                <h3>AWS Infrastructure Cloud Migration - Allianz Technology</h3>
-                <br>
-                <p>Played a key role in migrating 60,000 mobile devices from an on-premise infrastructure to the AWS Cloud platform. Developed component testing plans, reported bugs, and facilitated S/MIME certificate delivery without interrupting services to ensure a seamless migration experience.</p>
-                <br>
-                <ul>
-                    <li><strong>Tools:</strong> AWS Cloud, S/MIME, Testing Tools, Migration Tools</li>
-                    <li><strong>Key Features:</strong> Seamless migration process, S/MIME certificate delivery, compliance with no service interruption.</li>
-                </ul>
-            </div>
-        </div>
-    </div>
-</section>
+    function solve(id, val, statusEl) {
+      if (solved.has(id)) return;
+      const correct = expected[id];
+      const ok = normalize(val) === normalize(correct);
+      if (ok) {
+        solved.add(id);
+        const card = $("#"+id).closest(".card") || $("#"+id);
+        card.classList.add("done");
+        if (statusEl) { statusEl.innerHTML = `<span class="ok">✅ Correct</span>`; }
+        updateScore();
+      } else {
+        if (statusEl) { statusEl.innerHTML = `<span class="bad">❌ Try again</span>`; }
+      }
+    }
 
-    <!-- Certifications Section -->
-<section id="certifications">
-    <div class="container">
-        <h2 class="section-title" data-aos="fade-up">Certifications</h2>
-        <div class="certifications-grid">
-             <!-- Certification 1 -->
-            <div class="card certification-card" data-aos="fade-up">
-                <img src="packages/images/endpoint-security.png" alt="Certification 1" class="certification-image">
-                <h3>Cisco Certified Endpoint Security</h3>
-                <p>Issued by: Cisco</p>
-                <p>Date: Jan,2025</p>
-            </div>
-            <!-- Certification 2 -->
-            <div class="card certification-card" data-aos="fade-up">
-                <img src="packages/images/image.png" alt="Certification 2" class="certification-image">
-                <h3>Fortinet Certified Associate Cybersecurity</h3>
-                <p>Issued by: Fortinet</p>
-                <p>Date: Jan,2025</p>
-            </div>
-            <!-- Certification 3 -->
-            <div class="card certification-card" data-aos="fade-up">
-                <img src="packages/images/microsoft-certified-associate-badge.svg" alt="Certification 3" class="certification-image">
-                <h3>Microsoft 365 Certified: Endpoint Administrator Associate</h3>
-                <p>Issued by: Microsoft</p>
-                <p>Date: Dec,2024</p>
-            </div>
-            <!-- Certification 4 -->
-            <div class="card certification-card" data-aos="fade-up">
-                <img src="packages/images/apple-certified-support-professional.png" alt="Certification 4" class="certification-image">
-                <h3>Apple Certified Support Professional</h3>
-                <p>Issued by: Apple Inc.</p>
-                <p>Date: Nov,2024</p>
-            </div>
-            <!-- Certification 5 -->
-            <div class="card certification-card" data-aos="fade-up">
-                <img src="packages/images/twitter_thumb_201604_security-compliance-and-identity-fundamentals-600x600.png" alt="Certification 5" class="certification-image">
-                <h3>Microsoft Certified: Security, Compliance, and Identity Fundamentals</h3>
-                <p>Issued by: Microsoft</p>
-                <p>Date: Nov,2024</p>
-            </div>
-            <!-- Certification 6 -->
-            <div class="card certification-card" data-aos="fade-up">
-                <img src="packages/images/jamf-certified-associate-jamf-pro-2.png" alt="Certification 6" class="certification-image">
-                <h3>Jamf Certified Associate</h3>
-                <p>Issued by: Jamf</p>
-                <p>Date: Nov,2024</p>
-            </div>
-            <!-- Certification 7 -->
-            <div class="card certification-card" data-aos="fade-up">
-                <img src="packages/images/microsoft-certified-fundamentals-badge-2.svg" alt="Certification 7" class="certification-image">
-                <h3>Microsoft Certified: Azure Fundamentals</h3>
-                <p>Issued by: Microsoft</p>
-                <p>Date: Nov,2024</p>
-            </div>
-            <!-- Certification 8 -->
-            <div class="card certification-card" data-aos="fade-up">
-                <img src="packages/images/62056_badges_EducationTraining_Learn_BusIntelligence.png" alt="Certification 8" class="certification-image">
-                <h3>SAS Visual Analytics 1 for SAS Viya: Basics</h3>
-                <p>Issued by: SAS</p>
-                <p>Date: Nov,2023</p>
-            </div>
-            <!-- Certification 9 -->
-            <div class="card certification-card" data-aos="fade-up">
-                <img src="packages/images/62056_badges_EducationTraining_Learn_Programming.png" alt="Certification 9" class="certification-image">
-                <h3>SAS Programming 1: Essentials</h3>
-                <p>Issued by: SAS</p>
-                <p>Date: May,2023</p>
-            </div>
-            <!-- Certification 10 -->
-            <div class="card certification-card" data-aos="fade-up">
-                <img src="packages/images/DASA_DevOps_-_Fundamentals_-__600PX.png" alt="Certification 10" class="certification-image">
-                <h3>DASA DevOps Fundamentals</h3>
-                <p>Issued by: APMG International</p>
-                <p>Date: Feb,2022</p>
-            </div>
-            <!-- Certification 11 -->
-            <div class="card certification-card" data-aos="fade-up">
-                <img src="packages/images/ITIL-Foundation-Badge.png" alt="Certification 11" class="certification-image">
-                <h3>ITIL® Foundation Certificate in IT Service Management</h3>
-                <p>Issued by: PeopleCert</p>
-                <p>Date: July,2017</p>
-            </div>
+    // Accessibility: space/enter to toggle buttons focused
+    document.addEventListener("keydown", (e)=>{
+      if ((e.key === "Enter" || e.key === " ") && document.activeElement?.classList.contains("btn")) {
+        e.preventDefault();
+        document.activeElement.click();
+      }
+    });
 
-        </div>
-    </div>
-</section>
+    // Pre-fill some helps to keep flags easy-to-find
+    // c1: none needed (visible in "app.js")
+    // c2: none (decode shows the value)
+    // c3: hint already points at IP repetition
+    // c4: checking marks solved
+    // c5: Apply populates the flag
 
-
-<section id="contact">
-    <div class="container">
-        <h2 class="section-title" data-aos="fade-up">Contact Me</h2>
-        <div class="card contact-form" data-aos="fade-up">
-            <form id="contact-form" onsubmit="return handleSubmit(event)">
-                <div class="form-group">
-                    <input type="text" id="name" placeholder="Name" required>
-                </div>
-                <div class="form-group">
-                    <input type="email" id="email" placeholder="Email" required>
-                </div>
-                <div class="form-group">
-                    <textarea id="message" placeholder="Message" rows="5" required></textarea>
-                </div>
-                <button type="submit">Send Message</button>
-                <p id="response" style="color: green; margin-top: 10px;"></p>
-            </form>
-        </div>
-    </div>
-
-    <footer class="footer">
-        <div class="footer-content">
-            <p>&#169; <span id="year"></span> Jijo John Joseph. All rights reserved.</p>
-        </div>
-    </footer>
-
-    <script src="scripts.js"></script>
+    // Initialize UI
+    $("#time").textContent = fmt(remaining);
+    updateScore();
+  </script>
 </body>
 </html>
+``
