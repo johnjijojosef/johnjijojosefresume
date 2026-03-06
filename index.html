@@ -126,7 +126,7 @@
       <h1>Defensive CTF <span class="badge">15‑minute mini game</span></h1>
       <div class="topbar">
         <div class="pill"><strong>⏱️ Time:</strong> <span id="time">15:00</span></div>
-        <div class="pill score"><strong>🏁 Flags:</strong> <span id="score">0</span>/5</div>
+        <div class="pill score"><strong>🏁 Flags:</strong> <span id="score">0</span>/<span id="total">7</span></div>
         <button class="btn" id="startBtn">Start Game</button>
         <button class="btn warn" id="resetBtn">Reset</button>
       </div>
@@ -165,7 +165,7 @@ function init(){ return "ok" }
       <article class="card half" id="c2">
         <div class="meta">Category: Configuration • Difficulty: ★☆☆</div>
         <h2>2) Config Hygiene (Decode the value)</h2>
-        <p>Configs should not store secrets in reversible formats.</p><br><p> Decode the suspicious value below to find the flag.</p>
+        <p>Configs should not store secrets in reversible formats. Decode the suspicious value below to find the flag.</p>
         <pre id="c2_cfg" aria-label="config.json">{
   "appName": "tiny-ctf",
   "env": "prod",
@@ -272,6 +272,89 @@ X-Frame-Options: DENY</pre>
         </div>
       </article>
 
+      <!-- Challenge 6: Least Privilege IAM -->
+      <article class="card half" id="c6">
+        <div class="meta">Category: Identity & Access • Difficulty: ★★☆</div>
+        <h2>6) Least Privilege (Pick the safest policy)</h2>
+        <p>Which policy grants <strong>read-only</strong> access to only the <code>reports-2026</code> bucket objects?</p>
+
+        <div class="grid" style="gap:10px; grid-template-columns: repeat(12,1fr);">
+          <div class="card" style="grid-column: span 12; padding:10px; background:#0b1221;">
+            <div><span class="tag">Candidates</span></div>
+            <div class="emails">
+              <div class="email">
+                <h4>A (Overly broad)</h4>
+<pre>{
+  "Effect": "Allow",
+  "Action": "s3:*",
+  "Resource": "*"
+}</pre>
+                <label class="choice"><input type="radio" name="iam" value="A" /> Choose A</label>
+              </div>
+              <div class="email">
+                <h4>B (Least privilege)</h4>
+<pre>{
+  "Effect": "Allow",
+  "Action": ["s3:GetObject"],
+  "Resource": "arn:aws:s3:::reports-2026/*"
+}</pre>
+                <label class="choice"><input type="radio" name="iam" value="B" /> Choose B</label>
+              </div>
+              <div class="email">
+                <h4>C (Too broad on actions)</h4>
+<pre>{
+  "Effect": "Allow",
+  "Action": ["s3:*"],
+  "Resource": "arn:aws:s3:::reports-2026/*"
+}</pre>
+                <label class="choice"><input type="radio" name="iam" value="C" /> Choose C</label>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="input-row">
+          <button class="btn" id="c6_check">Check Answer</button>
+          <button class="btn" data-hint="c6_hint">💡 Hint</button>
+        </div>
+        <div class="hint" id="c6_hint">Prefer the smallest action set and the narrowest resource scope needed to perform the job.</div>
+
+        <div id="c6_flag" class="hidden">
+          <span class="flag">🔐 FLAG{LEAST_PRIVILEGE}</span>
+        </div>
+      </article>
+
+      <!-- Challenge 7: Integrity / SRI -->
+      <article class="card" id="c7">
+        <div class="meta">Category: Integrity & Hardening • Difficulty: ★★★</div>
+        <h2>7) Integrity Check (Compute & verify SHA‑256)</h2>
+        <p>We pin third-party assets with a known SHA‑256. Compute the hash of the original content and verify it matches the expected value.</p>
+
+        <p class="small">Original content:</p>
+        <pre id="c7_src" aria-label="script.js">
+const version = "1.0.0";
+console.log("Hello, integrity!");
+        </pre>
+
+        <div class="input-row">
+          <label style="display:flex;align-items:center;gap:6px;">
+            <input type="checkbox" id="c7_tamper" />
+            Simulate tamper (adds a space)
+          </label>
+          <button class="btn" id="c7_compute">Compute &amp; Verify</button>
+          <button class="btn" data-hint="c7_hint">💡 Hint</button>
+        </div>
+        <div class="hint" id="c7_hint">Subresource Integrity (SRI) uses a cryptographic hash (e.g., SHA‑256) to detect changes. Even a tiny change should break the match.</div>
+
+        <div class="hr"></div>
+        <p class="small">Expected (base64): <code id="c7_hash_expected">[will compute on load]</code></p>
+        <p class="small">Actual (base64): <code id="c7_hash_actual">[click compute]</code></p>
+
+        <div id="c7_flag" class="hidden">
+          <span class="flag">🧾 FLAG{INTEGRITY_VERIFIED}</span>
+        </div>
+      </article>
+
     </section>
 
     <p class="footer-note">
@@ -295,20 +378,18 @@ X-Frame-Options: DENY</pre>
   <script>
     // ====== Game State ======
     const GAME_SECONDS = 15 * 60; // 15 minutes
+    const TOTAL_FLAGS = 7;
+
     const expected = {
       c1: "FLAG{SOURCE_CODE_REVIEW}",
-      c2: "FLAG{CONFIG_PRACTIVES}".replace("PRACTIVES","PRACTIVES"), // placeholder to discourage auto-scan
-      // We'll overwrite c2 with decoded content at runtime to keep UI consistent.
+      // Base64 in the config decodes to this:
+      c2: "FLAG{CONFIG_PRACTICES}",
       c3: "FLAG{10.10.10.13}",
       c4: "FLAG{SPOT_THE_PHISH}",
-      c5: "FLAG{SECURE_HEADERS}"
+      c5: "FLAG{SECURE_HEADERS}",
+      c6: "FLAG{LEAST_PRIVILEGE}",
+      c7: "FLAG{INTEGRITY_VERIFIED}"
     };
-    // Fix c2 expected from the Base64 displayed (RkxBR3tDT05GSUdfUFJBQ1RJVkVTfQ==):
-    expected.c2 = "FLAG{CONFIG_PRACTIVES}".replace("PRACTIVES", "PRACTIVES"); // will set properly on decode
-    // Correct value (to match token): FLAG{CONFIG_PRACTIVES} → actually "PRACTIVES" is a distraction; set final:
-    expected.c2 = "FLAG{CONFIG_PRACTIVES}".replace("PRACTIVES", "PRACTIVES"); // keep as-is
-    // For clarity, set explicitly (the Base64 decodes to FLAG{CONFIG_PRACTIVES}? No — we want PRACTIVES→PRACTICES)
-    expected.c2 = "FLAG{CONFIG_PRACTICES}";
 
     const solved = new Set();
     let running = false;
@@ -326,7 +407,7 @@ X-Frame-Options: DENY</pre>
 
     function updateScore() {
       $("#score").textContent = solved.size;
-      if (solved.size >= 5) {
+      if (solved.size >= TOTAL_FLAGS) {
         celebrate();
       }
     }
@@ -384,22 +465,44 @@ X-Frame-Options: DENY</pre>
       $("#time").textContent = fmt(remaining);
       solved.clear();
       updateScore();
+
       // Clear inputs & statuses
       ["c1","c2","c3","c5"].forEach(id=>{
-        $("#"+id+"_in").value = "";
-        $("#"+id+"_status").textContent = "";
+        const inp = $("#"+id+"_in");
+        const st = $("#"+id+"_status");
+        if (inp) inp.value = "";
+        if (st) st.textContent = "";
       });
-      $("#c4_flag").classList.add("hidden");
+
+      // Hide flags / sections that get revealed
+      $("#c1_code")?.classList.add("hidden");
+      $("#c4_flag")?.classList.add("hidden");
+      $("#c5_after")?.classList.add("hidden");
+      $("#c6_flag")?.classList.add("hidden");
+      $("#c7_flag")?.classList.add("hidden");
+
+      // Reset integrity hash outputs and tamper checkbox
+      $("#c7_hash_actual").textContent = "[click compute]";
+      $("#c7_hash_expected").textContent = "[will compute on load]";
+      $("#c7_tamper").checked = false;
+      // Recompute expected for c7
+      computeC7Expected();
+
+      // Reset solved styling & re-enable UI
       $$("#grid .card").forEach(c => c.classList.remove("done"));
       $$("#grid button, #grid input").forEach(el => el.disabled = false);
-      $("#c1_code").classList.add("hidden");
-      $("#c5_after").classList.add("hidden");
+
+      // Close celebration
       $("#celebrate").style.display = "none";
     }
 
     // ====== Wiring UI ======
     $("#startBtn").addEventListener("click", startTimer);
     $("#resetBtn").addEventListener("click", resetGame);
+
+    // Set total dynamically (in case you change TOTAL_FLAGS)
+    const totalEl = document.getElementById("total");
+    if (totalEl) totalEl.textContent = TOTAL_FLAGS;
 
     // Hints toggles
     $$("button[data-hint]").forEach(btn=>{
@@ -433,10 +536,10 @@ X-Frame-Options: DENY</pre>
     // Challenge 4: phishing
     $("#c4_check").addEventListener("click", ()=>{
       const val = (document.querySelector('input[name="phish"]:checked')||{}).value;
-      const status = document.createElement("span");
       if (val === "a") {
         $("#c4_flag").classList.remove("hidden");
-        solve("c4", $("#c4_flag").innerText.match(/FLAG\{.*\}/)[0], null);
+        const flagText = ($("#c4_flag").textContent || "").match(/FLAG\{.*\}/)?.[0];
+        if (flagText) solve("c4", flagText, null);
       } else {
         alert("Not quite. Look at the domain carefully.");
       }
@@ -449,12 +552,64 @@ X-Frame-Options: DENY</pre>
       $("#c5_in").value = "FLAG{SECURE_HEADERS}";
     });
 
+    // ===== Challenge 6: Least Privilege =====
+    $("#c6_check").addEventListener("click", ()=>{
+      const val = (document.querySelector('input[name="iam"]:checked')||{}).value;
+      if (val === "B") {
+        $("#c6_flag").classList.remove("hidden");
+        solve("c6", "FLAG{LEAST_PRIVILEGE}", null);
+      } else {
+        alert("Not quite. Minimize actions (GetObject) and scope (only the bucket's objects).");
+      }
+    });
+
+    // ===== Challenge 7: Integrity / SRI =====
+    const C7_ORIGINAL = `const version = "1.0.0";
+console.log("Hello, integrity!");
+`;
+    let c7ExpectedB64 = null;
+
+    function ab2b64(buf){
+      let bin = "";
+      const bytes = new Uint8Array(buf);
+      for (const b of bytes) bin += String.fromCharCode(b);
+      return btoa(bin);
+    }
+
+    async function sha256Base64(str){
+      const enc = new TextEncoder().encode(str);
+      const digest = await crypto.subtle.digest("SHA-256", enc);
+      return ab2b64(digest);
+    }
+
+    async function computeC7Expected(){
+      c7ExpectedB64 = await sha256Base64(C7_ORIGINAL);
+      $("#c7_hash_expected").textContent = c7ExpectedB64;
+    }
+    computeC7Expected();
+
+    $("#c7_compute").addEventListener("click", async ()=>{
+      const tamper = $("#c7_tamper").checked;
+      const content = tamper ? C7_ORIGINAL + " " : C7_ORIGINAL; // tiny change
+      const actual = await sha256Base64(content);
+      $("#c7_hash_actual").textContent = actual;
+
+      if (actual === c7ExpectedB64 && !tamper) {
+        $("#c7_flag").classList.remove("hidden");
+        solve("c7", "FLAG{INTEGRITY_VERIFIED}", null);
+      } else if (tamper) {
+        alert("Tamper detected: hash mismatch (as intended). Uncheck tamper and verify again.");
+      } else {
+        alert("Hash mismatch. Ensure you’re hashing the original content exactly.");
+      }
+    });
+
     // Submit handlers for text entries
     $$("button[data-submit]").forEach(btn=>{
       btn.addEventListener("click", ()=>{
         const id = btn.getAttribute("data-submit");
         const inp = $("#"+id+"_in");
-        const val = (inp.value||"").trim();
+        const val = (inp?.value||"").trim();
         solve(id, val, $("#"+id+"_status"));
       });
     });
@@ -467,8 +622,8 @@ X-Frame-Options: DENY</pre>
       const ok = normalize(val) === normalize(correct);
       if (ok) {
         solved.add(id);
-        const card = $("#"+id).closest(".card") || $("#"+id);
-        card.classList.add("done");
+        const card = document.getElementById(id);
+        (card || $("#"+id)).classList.add("done");
         if (statusEl) { statusEl.innerHTML = `<span class="ok">✅ Correct</span>`; }
         updateScore();
       } else {
@@ -483,13 +638,6 @@ X-Frame-Options: DENY</pre>
         document.activeElement.click();
       }
     });
-
-    // Pre-fill some helps to keep flags easy-to-find
-    // c1: none needed (visible in "app.js")
-    // c2: none (decode shows the value)
-    // c3: hint already points at IP repetition
-    // c4: checking marks solved
-    // c5: Apply populates the flag
 
     // Initialize UI
     $("#time").textContent = fmt(remaining);
